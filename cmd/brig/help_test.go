@@ -76,6 +76,9 @@ func TestHelpFlagAmongBrigsFlagsAnswersHelp(t *testing.T) {
 			t.Errorf("brig %s: %v", strings.Join(args, " "), err)
 			continue
 		}
+		if out == usage {
+			t.Errorf("brig %s printed the global usage, not the verb's own:\n%s", strings.Join(args, " "), out)
+		}
 		if !strings.Contains(out, "brig "+args[0]) {
 			t.Errorf("brig %s did not print its usage:\n%s", strings.Join(args, " "), out)
 		}

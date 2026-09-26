@@ -1630,7 +1630,7 @@ grep -q 'brig agent rm' "$WORK/rmhelp.out" \
 # `brig <verb> --help` / -h and `brig help <verb>` -- print the same text.
 # stdout alone is compared: `help <verb>` loads the profiles first, so a notice
 # about one of them can precede the usage on stderr.
-for v in run sh info rm stop ls doctor version; do
+for v in run sh info rm stop ls logs doctor version; do
   "$WORK/brig" "$v" --help > "$WORK/vhelp.out" 2>&1 \
     && ok "brig $v --help exits 0" \
     || bad "brig $v --help exits 0: $(cat "$WORK/vhelp.out")"

@@ -250,6 +250,18 @@ func dispatch(args []string) error {
 		return nil
 	}
 	verb, rest := verbLine[0], verbLine[1:]
+	// Asking a verb for help is a question, not a mistake, so it is answered
+	// before the verb runs -- from the same text `brig help <verb>` reads, so
+	// the two spellings cannot drift. Only a help flag standing where brig's
+	// own flags go qualifies: once the ref is named, `--help` is the agent's
+	// word and is forwarded, which is what keeps `brig run <ref> --help`
+	// working.
+	if len(rest) > 0 && (rest[0] == "--help" || rest[0] == "-h") {
+		if text, ok := verbUsages[verb]; ok {
+			fmt.Print(text)
+			return nil
+		}
+	}
 	// rm's --dry-run, read off the line in the switch below and acted on where
 	// the run line reaches rm, after the ref has been resolved to a sandbox.
 	rmDryRun := false
@@ -303,6 +315,16 @@ func dispatch(args []string) error {
 
 	switch verb {
 	case "-h", "--help", "help":
+		// `brig help <verb>` names a verb and answers with that verb's usage,
+		// the text `brig <verb> --help` prints. A bare `brig help`, or a word
+		// that is not a verb, is the global text: the command list and the
+		// flags the verbs share.
+		if len(rest) > 0 {
+			if text, ok := verbUsages[rest[0]]; ok {
+				fmt.Print(text)
+				return nil
+			}
+		}
 		fmt.Print(usage)
 		return nil
 	case "version", "--version":

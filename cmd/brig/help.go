@@ -28,6 +28,7 @@ flags:
   -d, --detach        start the sandbox and exit, without attaching
       --skills        copy your ~/.claude skills and plugins into the guest home
       --network MODE  shared, isolated or offline (or BRIG_NETWORK)
+      --offline       shorthand for --network offline
       --publish PORT  open a guest port on the host; repeatable
       --json          run the agent as a child and print one JSON line after it
 
@@ -50,6 +51,7 @@ flags:
       --cpus N        guest vCPUs
       --skills        copy your ~/.claude skills and plugins into the guest home
       --network MODE  shared, isolated or offline (or BRIG_NETWORK)
+      --offline       shorthand for --network offline
       --publish PORT  open a guest port on the host; repeatable
       --json          run the command as a child and print one JSON line after it
 
@@ -81,6 +83,25 @@ left alone.
 flags:
       --dry-run  report what would be removed, and stop
   -y, --yes      with --all: the answer, given in advance
+
+brig help lists every command, every flag and every setting.
+`
+
+const logsUsage = `brig logs -- stream a sandbox's log
+
+usage:
+  brig logs <ref> [--follow] [--tail N] [--raw]
+  brig logs --gateway [<ref>]
+
+Streams the sandbox's log. Given --gateway it reads the gateway's log instead:
+the shared one, or with a ref the gateway serving that sandbox alone.
+
+flags:
+      --follow   keep the stream open and print lines as they appear
+      --tail N   print the last N lines (all of them by default)
+      --raw      print the runtime's bytes without filtering terminal control
+                 sequences
+      --gateway  read the gateway's log instead of the sandbox's
 
 brig help lists every command, every flag and every setting.
 `
@@ -150,6 +171,7 @@ var verbUsages = map[string]string{
 	"sh":         shUsage,
 	"stop":       stopUsage,
 	"rm":         rmUsage,
+	"logs":       logsUsage,
 	"info":       infoUsage,
 	"ls":         lsUsage,
 	"doctor":     doctorUsage,

@@ -9,7 +9,7 @@ import (
 
 // The top-level verbs the issue lists. Before this change, each refused --help
 // and -h with a usage error and printed nothing to stdout.
-var topLevelVerbs = []string{"run", "sh", "info", "rm", "stop", "ls", "doctor", "version"}
+var topLevelVerbs = []string{"run", "sh", "info", "rm", "stop", "ls", "logs", "doctor", "version"}
 
 // Asking a verb for help is a question, not a mistake: it is answered with that
 // verb's usage, on stdout, and the exit status is 0.
@@ -35,10 +35,13 @@ func TestEveryTopLevelVerbAnswersHelp(t *testing.T) {
 }
 
 // The two spellings of the same question answer with the same text, so a reader
-// who learns one has learnt the other.
+// who learns one has learnt the other. The group verbs are in the table too: a
+// verb group is a verb, and `brig help agent` answers with the group's own
+// usage, the text `brig agent --help` prints, which is unchanged.
 func TestHelpVerbPrintsTheTextTheFlagDoes(t *testing.T) {
 	t.Setenv("BRIG_PROFILE_DIR", t.TempDir())
-	for _, verb := range topLevelVerbs {
+	verbs := append([]string{"agent", "secret", "policy", "network", "telemetry", "completion"}, topLevelVerbs...)
+	for _, verb := range verbs {
 		byFlag, err := captureStdout(t, func() error { return run([]string{verb, "--help"}) })
 		if err != nil {
 			t.Fatalf("brig %s --help: %v", verb, err)
@@ -54,22 +57,27 @@ func TestHelpVerbPrintsTheTextTheFlagDoes(t *testing.T) {
 	}
 }
 
-// A verb group is a verb too: `brig help agent` answers with the group's own
-// usage, the text `brig agent --help` prints, which is unchanged.
-func TestHelpNamesAVerbGroup(t *testing.T) {
+// A help flag is read wherever brig's own flags can stand before the ref, not
+// only first: `brig run -d --help` asks the same question as `brig run --help`
+// and is answered with run's usage and a zero exit. The value of a flag is not
+// a help request, and neither is a --help after the ref -- both fall through
+// to the agent.
+func TestHelpFlagAmongBrigsFlagsAnswersHelp(t *testing.T) {
 	t.Setenv("BRIG_PROFILE_DIR", t.TempDir())
-	for _, verb := range []string{"agent", "secret", "policy", "network", "telemetry", "completion"} {
-		byFlag, err := captureStdout(t, func() error { return run([]string{verb, "--help"}) })
+	for _, args := range [][]string{
+		{"run", "-d", "--help"},
+		{"run", "--image", "x", "--help"},
+		{"run", "-d", "-h"},
+		{"run", "--image=x", "--help"},
+		{"logs", "--tail", "100", "--help"},
+	} {
+		out, err := captureStdout(t, func() error { return run(args) })
 		if err != nil {
-			t.Fatalf("brig %s --help: %v", verb, err)
+			t.Errorf("brig %s: %v", strings.Join(args, " "), err)
+			continue
 		}
-		byVerb, err := captureStdout(t, func() error { return run([]string{"help", verb}) })
-		if err != nil {
-			t.Fatalf("brig help %s: %v", verb, err)
-		}
-		if byFlag != byVerb {
-			t.Errorf("brig help %s and brig %s --help differ:\n--- brig help %s ---\n%s\n--- brig %s --help ---\n%s",
-				verb, verb, verb, byVerb, verb, byFlag)
+		if !strings.Contains(out, "brig "+args[0]) {
+			t.Errorf("brig %s did not print its usage:\n%s", strings.Join(args, " "), out)
 		}
 	}
 }

@@ -83,10 +83,11 @@ usage:
   brig version
 
 A <ref> is the session. claude is that agent's default session, and
-claude@refactor is a session of its own, with its own guest home, its own
-sandbox, and the label reaching the agent as its display name. A label brig
-would have to rewrite is refused rather than rewritten. brig ls prints the ref
-of every sandbox, and every verb above takes one.
+claude@refactor is a session of its own, with its own guest home and its own
+sandbox. The label selects the guest home and the sandbox name for every
+agent. brig run also passes it to claude-code as its display name. A label
+brig would have to rewrite is refused rather than rewritten. brig ls prints
+the ref of every sandbox, and every verb above takes one.
 
 global flags (left of the command, as in: brig -q run claude):
       --verbose          the execution envelope, brig's own progress and the
@@ -859,8 +860,9 @@ func runAgent(cfg *wrap.Config, set creds.Set, t profile.Profile, tail []string,
 	return cfg.Exec(set, argv, isTerminal())
 }
 
-// agentArgs adds the agent's own session-name flag, so the name you typed
-// travels in unchanged as the display name while only the paths use the slug.
+// agentArgs adds the agent's own session-name flag. Only claude-code takes the
+// label as its display name; every other profile gets the tail unchanged, and
+// the paths use the slug either way.
 func agentArgs(cfg *wrap.Config, t profile.Profile, tail []string) []string {
 	if cfg.RawName != "" && t.Name == "claude-code" {
 		return append([]string{"--name", cfg.RawName}, tail...)

@@ -134,6 +134,26 @@ func TestUsageTeachesTheAgentGroup(t *testing.T) {
 	}
 }
 
+// #7 corrected the help, but its test pinned agentArgs, which already behaved
+// that way: it passed on the tree before the fix and so proved nothing. The
+// wrong claim lived in the usage text, so assert it there. The paragraph wraps
+// inside the const, so fold it to one line first; a re-wrap must not hide a
+// wrong claim. The three sentences are which agent gets the session label as a
+// display name: brig run passes it to claude-code, brig sh does not, and no
+// other agent receives it.
+func TestUsageSaysWhichAgentsGetTheSessionLabel(t *testing.T) {
+	text := strings.Join(strings.Fields(usage), " ")
+	for _, want := range []string{
+		"passes it to claude-code as its display name",
+		"brig sh does not pass it",
+		"no other agent receives it",
+	} {
+		if !strings.Contains(text, want) {
+			t.Errorf("the usage text does not say %q", want)
+		}
+	}
+}
+
 // `brig agent --help` is a question, not a mistake, and so is the --help a
 // verb's own parser sees. The profile group already answered both this way.
 func TestAgentHelpPrintsUsageAndSucceeds(t *testing.T) {

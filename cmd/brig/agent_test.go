@@ -134,9 +134,9 @@ func TestUsageTeachesTheAgentGroup(t *testing.T) {
 	}
 }
 
-// `brig agent --help` has to agree with docs/sessions.md, so the usage text
-// has to carry the case that holds: it once said every agent receives the
-// session label as its display name. The code passes it only to claude-code,
+// `brig --help` has to agree with docs/sessions.md, so the usage text has to
+// carry the case that holds: it once said every agent receives the session
+// label as its display name. The code passes it only to claude-code,
 // on brig run in agentArgs, as docs/sessions.md says. Asserted on the const
 // rather than on run()'s output because that is where a future edit would put
 // the stale claim back. The paragraph wraps inside the const, so fold it to

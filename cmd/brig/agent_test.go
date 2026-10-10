@@ -134,13 +134,13 @@ func TestUsageTeachesTheAgentGroup(t *testing.T) {
 	}
 }
 
-// #7 corrected the help, but its test pinned agentArgs, which already behaved
-// that way: it passed on the tree before the fix and so proved nothing. The
-// wrong claim lived in the usage text, so assert it there. The paragraph wraps
-// inside the const, so fold it to one line first; a re-wrap must not hide a
-// wrong claim. The three sentences are which agent gets the session label as a
-// display name: brig run passes it to claude-code, brig sh does not, and no
-// other agent receives it.
+// The usage text is the only place a reader learns the label's reach, so it
+// has to carry the case that holds: it once said every agent receives the
+// session label as its display name. The code passes it only to claude-code,
+// on brig run in agentArgs, as docs/sessions.md says. Asserted on the const
+// rather than on run()'s output because that is where a future edit would put
+// the stale claim back. The paragraph wraps inside the const, so fold it to
+// one line first; a re-wrap must not hide a wrong claim.
 func TestUsageSaysWhichAgentsGetTheSessionLabel(t *testing.T) {
 	text := strings.Join(strings.Fields(usage), " ")
 	for _, want := range []string{

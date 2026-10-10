@@ -134,13 +134,15 @@ func TestUsageTeachesTheAgentGroup(t *testing.T) {
 	}
 }
 
-// The usage text is the only place a reader learns the label's reach, so it
-// has to carry the case that holds: it once said every agent receives the
-// session label as its display name. The code passes it only to claude-code,
+// `brig --help` has to agree with docs/sessions.md, so the usage text has to
+// carry the case that holds: it once said every agent receives the session
+// label as its display name. The code passes it only to claude-code,
 // on brig run in agentArgs, as docs/sessions.md says. Asserted on the const
 // rather than on run()'s output because that is where a future edit would put
 // the stale claim back. The paragraph wraps inside the const, so fold it to
-// one line first; a re-wrap must not hide a wrong claim.
+// one line first; the test only checks that the required phrases are present,
+// so folding cannot catch a wrong claim -- what it does is keep a correct
+// paragraph from failing when it is re-wrapped.
 func TestUsageSaysWhichAgentsGetTheSessionLabel(t *testing.T) {
 	text := strings.Join(strings.Fields(usage), " ")
 	for _, want := range []string{

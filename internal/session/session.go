@@ -4,7 +4,8 @@
 // directory and its own microVM, so two names keep two guest homes and two
 // virtual machines. The name selects the guest home and the sandbox for every
 // agent, and `brig run` also passes it to claude-code as its display name.
-// Only the paths use the slug.
+// An `@` label is already slug-clean, so the name and the slug differ only
+// for the retired `--name` spelling.
 package session
 
 import (
